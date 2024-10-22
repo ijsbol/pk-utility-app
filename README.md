@@ -1,2 +1,1 @@
-# pluralkit-dm-utility
- 
+# PluralKit Utilities
