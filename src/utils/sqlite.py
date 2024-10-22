@@ -27,16 +27,15 @@ def check_sqlite_connection() -> None:
         print(f"SQLite Database Version is: {record}")
 
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS UserConfig (
+            CREATE TABLE IF NOT EXISTS UserPKToken (
                 discord_user_id     TEXT NOT NULL,
-                pluralkit_token     TEXT,
-                whitelist_mode      BOOLEAN NOT NULL
+                pluralkit_token     TEXT
             );
         """)
 
         cursor.execute("""
             CREATE UNIQUE INDEX IF NOT EXISTS unique_discord_user_id
-                ON UserConfig(discord_user_id);
+                ON UserPKToken(discord_user_id);
         """)
 
         cursor.execute("""

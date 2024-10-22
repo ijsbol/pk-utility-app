@@ -13,9 +13,9 @@ class PluralKitDMUtilities(AutoShardedBot):
 
     async def setup_hook(self):
         check_sqlite_connection()
-        await self.load_extension('cogs.config')
         await self.load_extension('cogs.check')
-        await self.load_extension('cogs.pkutilities')
+        await self.load_extension('cogs.pk_token')
+        await self.load_extension('cogs.whitelist')
         # await self.tree.sync()
 
 
