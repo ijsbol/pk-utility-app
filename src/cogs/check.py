@@ -64,6 +64,8 @@ class CheckCommand(Cog):
             if len(fronters_formatted) >= MAX_SHOWN_FRONTERS:
                 continue
             member = await self.bot.service.get_member_information(message.author.id, member_id)
+            if member is None:
+                continue
             if member.get('privacy', {}).get('visibility', 'public') == 'public':
                 fronters_formatted.append(
                     f"[{member['display_name'] or member['name']}](https://pluralkit.xyz/m/{member_id})"
