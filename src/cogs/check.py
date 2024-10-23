@@ -91,6 +91,8 @@ class CheckCommand(Cog):
         await self._handle_check_command(interaction, message.created_at, message.author.id)
 
     @app_commands.command(name="check-front", description="Check a front by message URL!")
+    @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
+    @app_commands.allowed_installs(users=True, guilds=True)
     async def check_front_command(
         self,
         interaction: Interaction[PluralKitDMUtilities],
