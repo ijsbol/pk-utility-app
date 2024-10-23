@@ -10,7 +10,7 @@ from discord.ext.commands import AutoShardedBot
 
 from utils.env import DATABASE_NAME
 from utils.functions import unix_to_rfc3399
-from utils.types import SwitchAPI
+from utils.types import SwitchAPI, UserConfig
 
 
 type PluralKitDMUtilities = AutoShardedBot
@@ -34,9 +34,9 @@ class Service:
         self.bot = bot
 
     async def __fetch_pk_api_headers(self, user_id: int) -> dict[str, str]:
-        user_token = await self.get_pluralkit_token(user_id)
-        if user_token is not None:
-            return {'Authorization': user_token}
+        user_token = await self.get_user_config(user_id)
+        if user_token is not None and user_token['pluralkit_token'] is not None:
+            return {'Authorization': user_token['pluralkit_token']}
         return {}
 
     async def get_member_information(self, user_id: int, member_id: str) -> dict[str, Any]:
@@ -101,38 +101,73 @@ class Service:
             await db.execute(query, args)
             await db.commit()
 
-    async def set_pluralkit_token(self, user_id: int, pluralkit_token: str | None) -> None:
+    async def set_whitelist_enabled(self, user_id: int, whitelist_enabled: bool) -> None:
         query = """
-            INSERT INTO UserPKToken (
+            INSERT INTO UserConfig (
                 discord_user_id,
-                pluralkit_token
-            ) VALUES (?, ?)
+                pluralkit_token,
+                whitelist_enabled,
+                prefer_display_names
+            ) VALUES (?, ?, ?, ?)
             ON CONFLICT(discord_user_id)
-                DO UPDATE SET pluralkit_token=pluralkit_token;
+                DO UPDATE SET whitelist_enabled=whitelist_enabled;
         """
-        args = (user_id, pluralkit_token)
+        args = (user_id, None, whitelist_enabled, True)
         async with aio_connect(DATABASE_NAME) as db:
             db.row_factory = Row
             await db.execute(query, args)
             await db.commit()
 
-    async def get_pluralkit_token(self, user_id: int) -> str | None:
+    async def set_prefer_display_names(self, user_id: int, prefer_display_names: bool) -> None:
         query = """
-            SELECT pluralkit_token FROM UserPKToken
+            INSERT INTO UserConfig (
+                discord_user_id,
+                pluralkit_token,
+                whitelist_enabled,
+                prefer_display_names
+            ) VALUES (?, ?, ?, ?)
+            ON CONFLICT(discord_user_id)
+                DO UPDATE SET whitelist_enabled=whitelist_enabled;
+        """
+        args = (user_id, None, True, prefer_display_names)
+        async with aio_connect(DATABASE_NAME) as db:
+            db.row_factory = Row
+            await db.execute(query, args)
+            await db.commit()
+
+    async def set_pluralkit_token(self, user_id: int, pluralkit_token: str | None) -> None:
+        query = """
+            INSERT INTO UserConfig (
+                discord_user_id,
+                pluralkit_token,
+                whitelist_enabled,
+                prefer_display_names
+            ) VALUES (?, ?, ?, ?)
+            ON CONFLICT(discord_user_id)
+                DO UPDATE SET pluralkit_token=pluralkit_token;
+        """
+        args = (user_id, pluralkit_token, True, True)
+        async with aio_connect(DATABASE_NAME) as db:
+            db.row_factory = Row
+            await db.execute(query, args)
+            await db.commit()
+
+    async def get_user_config(self, user_id: int) -> UserConfig | None:
+        query = """
+            SELECT * FROM UserConfig
                 WHERE discord_user_id=?
         """
         args = (str(user_id),)
         async with aio_connect(DATABASE_NAME) as db:
             db.row_factory = Row
-            data = await (await db.execute(query, args)).fetchone()
-            data = cast(dict[str, Any] | None, data)
-            if data is None:
-                return
-        return data['pluralkit_token']
+            return cast(
+                UserConfig | None,
+                (await (await db.execute(query, args)).fetchone())
+            )
 
-    async def delete_pluralkit_token(self, user_id: int) -> None:
+    async def delete_config(self, user_id: int) -> None:
         query = """
-            DELETE FROM UserPKToken
+            DELETE FROM UserConfig
                 WHERE discord_user_id=?
         """
         args = (str(user_id),)

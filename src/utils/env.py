@@ -10,6 +10,7 @@ load_dotenv()
 __all__: tuple[str, ...] = (
     "DISCORD_BOT_TOKEN",
     "DATABASE_NAME",
+    "YOUR_DISCORD_USER_ID",
 )
 
 
@@ -49,3 +50,4 @@ def _get_optional_str(key: str) -> str | None:
 
 DISCORD_BOT_TOKEN: str = _get_str("DISCORD_BOT_TOKEN")
 DATABASE_NAME: str = _get_str("DATABASE_NAME") + ".db"
+YOUR_DISCORD_USER_ID: int = _get_int("YOUR_DISCORD_USER_ID")

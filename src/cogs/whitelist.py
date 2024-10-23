@@ -92,6 +92,27 @@ class WhitelistCommand(Cog):
             ephemeral=True,
         )
 
+    @whitelist.command(
+        name="enable",
+        description="Enable your whitelist.",
+    )
+    async def config_whitelist_enable(self, interaction: Interaction[PluralKitDMUtilities]) -> None:
+        await self.bot.service.set_whitelist_enabled(interaction.user.id, True)
+        await interaction.response.send_message(
+            content="Your whitelist has been enabled, only approved users can see your front history using this app. You can add approved users by doing `/whitelist add`.",
+            ephemeral=True,
+        )
+
+    @whitelist.command(
+        name="disable",
+        description="Disable your whitelist.",
+    )
+    async def config_whitelist_disable(self, interaction: Interaction[PluralKitDMUtilities]) -> None:
+        await self.bot.service.set_whitelist_enabled(interaction.user.id, False)
+        await interaction.response.send_message(
+            content="Your whitelist has been disabled, anyone can now see your front history using this app.",
+            ephemeral=True,
+        )
 
 async def setup(bot: PluralKitDMUtilities) -> None:
     await bot.add_cog(WhitelistCommand(bot))

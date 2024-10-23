@@ -14,9 +14,11 @@ Add to your server: https://discord.com/oauth2/authorize?client_id=8076941265898
 1. Install Python3.12+
 2. Rename `.env.sample` to `.env`
 3. Replace the `DISCORD_BOT_TOKEN` value from `...` to your Discord bot token.
-4. Run the following: `python -m pip install venv`
-5. Run the following: `python -m venv venv`
-6. Run the following: `source venv/bin/activate`
-7. Run the following: `pip install -r requirements.txt`
-8. Run the following: `cd src`
-9. Run the following: `python bot.py`
+4. Replace the `YOUR_DISCORD_USER_ID` value from `...` to your Discord user ID.
+5. Run the following: `python -m pip install venv`
+6. Run the following: `python -m venv venv`
+7. Run the following: `source venv/bin/activate`
+8. Run the following: `pip install -r requirements.txt`
+9. Run the following: `cd src`
+10. Run the following: `python bot.py`
+12. DM the bot: `@botmention sync`

@@ -9,11 +9,17 @@ class PKTokenCommand(Cog):
     def __init__(self, bot: PluralKitDMUtilities) -> None:
         self.bot = bot
 
-    pk_token = Group(
-        name="pk-token",
-        description="Set/delete your PluralKit api token for systems who have a private front history.",
+    config = Group(
+        name="config",
+        description="Setup your PK Utilities config",
         allowed_contexts=AppCommandContext(guild=True, dm_channel=True, private_channel=True),
         allowed_installs=AppInstallationType(guild=True, user=True),
+    )
+
+    pk_token = Group(
+        parent=config,
+        name="pk-token",
+        description="Set/delete your PluralKit api token for systems who have a private front history.",
     )
 
     @pk_token.command(
@@ -32,12 +38,22 @@ class PKTokenCommand(Cog):
         description="Delete your pluralkit token (if your front history is public).",
     )
     async def config_pluralkit_token_delete(self, interaction: Interaction[PluralKitDMUtilities]) -> None:
-        await self.bot.service.delete_pluralkit_token(interaction.user.id)
+        await self.bot.service.set_pluralkit_token(interaction.user.id, None)
         return await interaction.response.send_message(
             content="Your PluralKit token has been deleted!",
             ephemeral=True,
         )
 
+    @config.command(
+        name="set-prefer-display-name",
+        description="Set your front display to prefer a members display name or not.",
+    )
+    async def config_set_prefer_dispaly_name(self, interaction: Interaction[PluralKitDMUtilities], use_display_names: bool) -> None:
+        await self.bot.service.set_prefer_display_names(interaction.user.id, use_display_names)
+        message = "Your front will now show members display names."
+        if not use_display_names:
+            message = "Your front will now show members names rather than display names."
+        return await interaction.response.send_message(content=message, ephemeral=True)
 
 async def setup(bot: PluralKitDMUtilities) -> None:
     await bot.add_cog(PKTokenCommand(bot))

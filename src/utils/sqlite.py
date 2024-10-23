@@ -50,6 +50,30 @@ def check_sqlite_connection() -> None:
                 ON UserWhitelist(whitelist_owner_user_id, whitelisted_user_id);
         """)
 
+        # Migrations
+        try:
+            cursor.execute("""
+                ALTER TABLE UserPKToken RENAME TO UserConfig;
+            """)
+        except Error:
+            pass
+
+        try:
+            cursor.execute("""
+                ALTER TABLE UserConfig ADD COLUMN
+                    whitelist_enabled BOOLEAN NOT NULL DEFAULT true;
+            """)
+        except Error:
+            pass
+
+        try:
+            cursor.execute("""
+                ALTER TABLE UserConfig ADD COLUMN
+                    prefer_display_names BOOLEAN NOT NULL DEFAULT true;
+            """)
+        except Error:
+            pass
+
         cursor.close()
     except Error as error:
         print(f"[SQLite Error] Error while connecting to SQLite {error}")
