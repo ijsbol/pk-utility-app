@@ -32,7 +32,6 @@ class CheckCommand(Cog):
         whitelist = await self.bot.service.get_user_whitelist(author_id)
         whitelist.append(author_id)
         user_information = await self.bot.service.get_user_config(author_id)
-        print(user_information)
         if (
             interaction.user.id not in whitelist
             and user_information is not None
