@@ -110,9 +110,9 @@ class Service:
                 prefer_display_names
             ) VALUES (?, ?, ?, ?)
             ON CONFLICT(discord_user_id)
-                DO UPDATE SET whitelist_enabled=whitelist_enabled;
+                DO UPDATE SET whitelist_enabled=?;
         """
-        args = (user_id, None, whitelist_enabled, True)
+        args = (user_id, None, whitelist_enabled, True, whitelist_enabled)
         async with aio_connect(DATABASE_NAME) as db:
             db.row_factory = Row
             await db.execute(query, args)
@@ -127,9 +127,9 @@ class Service:
                 prefer_display_names
             ) VALUES (?, ?, ?, ?)
             ON CONFLICT(discord_user_id)
-                DO UPDATE SET whitelist_enabled=whitelist_enabled;
+                DO UPDATE SET prefer_display_names=?;
         """
-        args = (user_id, None, True, prefer_display_names)
+        args = (user_id, None, True, prefer_display_names, prefer_display_names)
         async with aio_connect(DATABASE_NAME) as db:
             db.row_factory = Row
             await db.execute(query, args)
@@ -144,9 +144,9 @@ class Service:
                 prefer_display_names
             ) VALUES (?, ?, ?, ?)
             ON CONFLICT(discord_user_id)
-                DO UPDATE SET pluralkit_token=pluralkit_token;
+                DO UPDATE SET pluralkit_token=?;
         """
-        args = (user_id, pluralkit_token, True, True)
+        args = (user_id, pluralkit_token, True, True, pluralkit_token)
         async with aio_connect(DATABASE_NAME) as db:
             db.row_factory = Row
             await db.execute(query, args)
