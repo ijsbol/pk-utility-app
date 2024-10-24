@@ -73,8 +73,13 @@ class CheckCommand(Cog):
                     f"[{self.bot.service.format_member_name(member, use_display_name)}](https://pluralkit.xyz/m/{member_id})"
                 )
 
+        if len(front_ids) > 0:
+            await interaction.edit_original_response(
+                content=f"Fronters: {', '.join(fronters_formatted)}",
+            )
+            return
         await interaction.edit_original_response(
-            content=f"Fronters: {', '.join(fronters_formatted)}",
+            content="There is no one currently fronting / registered as switched in for this system."
         )
 
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
