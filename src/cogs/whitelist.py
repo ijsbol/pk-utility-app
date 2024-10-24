@@ -87,10 +87,9 @@ class WhitelistCommand(Cog):
             )
 
         whitelist_page = whitelist_chunked[page - 1]
-        return await interaction.response.send_message(
-            content='\n'.join(whitelist_page),
-            ephemeral=True,
-        )
+        formatted = '\n'.join(whitelist_page)
+        formatted += f"\n\n-# **Page {page} / {len(whitelist_chunked)}**"
+        return await interaction.response.send_message(content=formatted, ephemeral=True)
 
     @whitelist.command(
         name="enable",
