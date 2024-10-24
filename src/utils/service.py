@@ -39,11 +39,12 @@ class Service:
             return {'Authorization': user_token['pluralkit_token']}
         return {}
 
-    async def get_member_information(self, user_id: int, member_id: str) -> dict[str, Any]:
+    async def get_system_member_information(self, user_id: int) -> dict[str, dict[str, Any]]:
         headers = await self.__fetch_pk_api_headers(user_id)
         async with ClientSession(headers=headers, base_url="https://api.pluralkit.me") as session:
-            async with session.get(url=f"/v2/members/{member_id}") as resp:
-                return await resp.json()
+            async with session.get(url=f"/v2/systems/{user_id}/members") as resp:
+                member_data = await resp.json()
+                return {m['id']: m for m in member_data}
 
     async def get_front_at_time(self, user_id: int, time: datetime, *, skip_auth_headers: bool) -> list[SwitchAPI] | int:
         headers = {}

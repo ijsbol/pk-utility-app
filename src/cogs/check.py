@@ -13,9 +13,6 @@ from utils.functions import snowflake_to_timestamp
 from utils.types import SwitchAPI
 
 
-MAX_SHOWN_FRONTERS: int = 4
-
-
 class CheckCommand(Cog):
     def __init__(self, bot: PluralKitDMUtilities) -> None:
         self.bot = bot
@@ -66,22 +63,18 @@ class CheckCommand(Cog):
             use_display_name = user_information['prefer_display_names']
         front_ids = recent_switches[0]['members']
         fronters_formatted: list[str] = []
+        members = await self.bot.service.get_system_member_information(author_id)
         for member_id in front_ids:
-            if len(fronters_formatted) >= MAX_SHOWN_FRONTERS:
-                continue
-            member = await self.bot.service.get_member_information(author_id, member_id)
+            member = members.get(member_id, None)
             if member is None:
                 continue
             if (member.get('privacy', {}) or {}).get('visibility', 'public') == 'public':
                 fronters_formatted.append(
                     f"[{(member['display_name'] or member['name']) if use_display_name else member['name']}](https://pluralkit.xyz/m/{member_id})"
                 )
-        extra = ""
-        if len(fronters_formatted) > MAX_SHOWN_FRONTERS:
-            extra = f" (+ {len(front_ids)-MAX_SHOWN_FRONTERS} more)"
 
         await interaction.edit_original_response(
-            content=f"Fronters: {', '.join(fronters_formatted)}{extra}",
+            content=f"Fronters: {', '.join(fronters_formatted)}",
         )
 
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
