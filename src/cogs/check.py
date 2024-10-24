@@ -70,7 +70,7 @@ class CheckCommand(Cog):
                 continue
             if (member.get('privacy', {}) or {}).get('visibility', 'public') == 'public':
                 fronters_formatted.append(
-                    f"[{(member['display_name'] or member['name']) if use_display_name else member['name']}](https://pluralkit.xyz/m/{member_id})"
+                    f"[{self.bot.service.format_member_name(member, use_display_name)}](https://pluralkit.xyz/m/{member_id})"
                 )
 
         await interaction.edit_original_response(

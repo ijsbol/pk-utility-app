@@ -33,6 +33,9 @@ class Service:
     def __init__(self, bot: PluralKitDMUtilities) -> None:
         self.bot = bot
 
+    def format_member_name(self, member: dict[str, Any], use_display_name: bool) -> str:
+        return (member['display_name'] or member['name']) if use_display_name else member['name']
+
     async def __fetch_pk_api_headers(self, user_id: int) -> dict[str, str]:
         user_token = await self.get_user_config(user_id)
         if user_token is not None and user_token['pluralkit_token'] is not None:

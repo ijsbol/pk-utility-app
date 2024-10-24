@@ -16,6 +16,7 @@ class PluralKitDMUtilities(AutoShardedBot):
         await self.load_extension('cogs.check')
         await self.load_extension('cogs.config')
         await self.load_extension('cogs.whitelist')
+        await self.load_extension('cogs.stats')
 
 
 intents = Intents.none()
