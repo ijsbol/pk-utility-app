@@ -68,13 +68,13 @@ class PKTokenCommand(Cog):
         return await interaction.response.send_message(content=message, ephemeral=True)
 
     @config.command(
-        name="set-member-visibility",
+        name="set-private-member-visibility",
         description="Set if private members should be shown in your front list.",
     )
     @choices(privacy_setting=[
-        Choice(name="Hidden from everyone (including you)", value=PRIVATE_TO_EVERYONE_INCL_SYSTEM),
-        Choice(name="Hidden from everyone (except you) [default] ", value=PRIVATE_TO_EVERYONE_NOT_INCL_SYSTEM),
-        Choice(name="Shown to everyone", value=PUBLIC_TO_EVERYONE),
+        Choice(name="Private members should be: Hidden from everyone (including you)", value=PRIVATE_TO_EVERYONE_INCL_SYSTEM),
+        Choice(name="Private members should be: Hidden from everyone (except you) [default] ", value=PRIVATE_TO_EVERYONE_NOT_INCL_SYSTEM),
+        Choice(name="Private members should be: Shown to everyone", value=PUBLIC_TO_EVERYONE),
     ])
     async def config_set_member_visibility(
         self,
