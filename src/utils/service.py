@@ -10,7 +10,7 @@ from discord.ext.commands import AutoShardedBot
 
 from utils.env import DATABASE_NAME
 from utils.functions import unix_to_rfc3399
-from utils.types import SwitchAPI, UserConfig
+from utils.types import FrontMemberVisibility, SwitchAPI, UserConfig
 
 
 type PluralKitDMUtilities = AutoShardedBot
@@ -109,14 +109,12 @@ class Service:
         query = """
             INSERT INTO UserConfig (
                 discord_user_id,
-                pluralkit_token,
-                whitelist_enabled,
-                prefer_display_names
-            ) VALUES (?, ?, ?, ?)
+                whitelist_enabled
+            ) VALUES (?, ?)
             ON CONFLICT(discord_user_id)
                 DO UPDATE SET whitelist_enabled=?;
         """
-        args = (user_id, None, whitelist_enabled, True, whitelist_enabled)
+        args = (user_id, whitelist_enabled, whitelist_enabled)
         async with aio_connect(DATABASE_NAME) as db:
             db.row_factory = Row
             await db.execute(query, args)
@@ -126,14 +124,12 @@ class Service:
         query = """
             INSERT INTO UserConfig (
                 discord_user_id,
-                pluralkit_token,
-                whitelist_enabled,
                 prefer_display_names
-            ) VALUES (?, ?, ?, ?)
+            ) VALUES (?, ?)
             ON CONFLICT(discord_user_id)
                 DO UPDATE SET prefer_display_names=?;
         """
-        args = (user_id, None, True, prefer_display_names, prefer_display_names)
+        args = (user_id, prefer_display_names, prefer_display_names)
         async with aio_connect(DATABASE_NAME) as db:
             db.row_factory = Row
             await db.execute(query, args)
@@ -143,14 +139,27 @@ class Service:
         query = """
             INSERT INTO UserConfig (
                 discord_user_id,
-                pluralkit_token,
-                whitelist_enabled,
-                prefer_display_names
-            ) VALUES (?, ?, ?, ?)
+                pluralkit_token
+            ) VALUES (?, ?)
             ON CONFLICT(discord_user_id)
                 DO UPDATE SET pluralkit_token=?;
         """
-        args = (user_id, pluralkit_token, True, True, pluralkit_token)
+        args = (user_id, pluralkit_token, pluralkit_token)
+        async with aio_connect(DATABASE_NAME) as db:
+            db.row_factory = Row
+            await db.execute(query, args)
+            await db.commit()
+
+    async def set_front_member_visibility(self, user_id: int, front_member_visibility: FrontMemberVisibility) -> None:
+        query = """
+            INSERT INTO UserConfig (
+                discord_user_id,
+                front_member_visibility
+            ) VALUES (?, ?)
+            ON CONFLICT(discord_user_id)
+                DO UPDATE SET front_member_visibility=?;
+        """
+        args = (user_id, front_member_visibility, front_member_visibility)
         async with aio_connect(DATABASE_NAME) as db:
             db.row_factory = Row
             await db.execute(query, args)

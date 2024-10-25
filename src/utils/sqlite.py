@@ -74,6 +74,14 @@ def check_sqlite_connection() -> None:
         except Error:
             pass
 
+        try:
+            cursor.execute("""
+                ALTER TABLE UserConfig ADD COLUMN
+                    front_member_visibility INTEGER NOT NULL DEFAULT 1;
+            """)
+        except Error:
+            pass
+
         cursor.close()
     except Error as error:
         print(f"[SQLite Error] Error while connecting to SQLite {error}")

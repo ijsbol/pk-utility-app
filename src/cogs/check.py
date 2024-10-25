@@ -10,7 +10,13 @@ from utils.constants import (
     PLURALKIT_API_ERROR_SYSTEM_NOT_FOUND,
 )
 from utils.functions import snowflake_to_timestamp
-from utils.types import SwitchAPI
+from utils.types import (
+    PRIVATE_TO_EVERYONE_INCL_SYSTEM,
+    PRIVATE_TO_EVERYONE_NOT_INCL_SYSTEM,
+    PUBLIC_TO_EVERYONE,
+    FrontMemberVisibility,
+    SwitchAPI,
+)
 
 
 class CheckCommand(Cog):
@@ -61,6 +67,18 @@ class CheckCommand(Cog):
         use_display_name = True
         if user_information is not None:
             use_display_name = user_information['prefer_display_names']
+
+        front_member_visibility: FrontMemberVisibility = PRIVATE_TO_EVERYONE_NOT_INCL_SYSTEM
+        if user_information is not None:
+            front_member_visibility = user_information['front_member_visibility']
+
+        show_private_members = (
+            False if front_member_visibility == PRIVATE_TO_EVERYONE_INCL_SYSTEM
+            else True if front_member_visibility == PRIVATE_TO_EVERYONE_NOT_INCL_SYSTEM and author_id == interaction.user.id
+            else True if front_member_visibility == PUBLIC_TO_EVERYONE
+            else False  # base case that should never be called lol
+        )
+
         front_ids = recent_switches[0]['members']
         fronters_formatted: list[str] = []
         members = await self.bot.service.get_system_member_information(author_id)
@@ -68,7 +86,8 @@ class CheckCommand(Cog):
             member = members.get(member_id, None)
             if member is None:
                 continue
-            if (member.get('privacy', {}) or {}).get('visibility', 'public') == 'public':
+            member_is_private = not (member.get('privacy', {}) or {}).get('visibility', 'public') == 'public'
+            if not member_is_private or member_is_private and show_private_members:
                 fronters_formatted.append(
                     f"[{self.bot.service.format_member_name(member, use_display_name)}](https://pluralkit.xyz/m/{member_id})"
                 )

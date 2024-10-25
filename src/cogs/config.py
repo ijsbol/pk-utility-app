@@ -1,8 +1,20 @@
 from discord import Interaction
-from discord.app_commands import AppCommandContext, AppInstallationType, Group
+from discord.app_commands import (
+    AppCommandContext,
+    AppInstallationType,
+    Group,
+    Choice,
+    choices,
+)
 from discord.ext.commands import Cog
 
 from bot import PluralKitDMUtilities
+from utils.types import (
+    PRIVATE_TO_EVERYONE_INCL_SYSTEM,
+    PRIVATE_TO_EVERYONE_NOT_INCL_SYSTEM,
+    PUBLIC_TO_EVERYONE,
+    FrontMemberVisibility,
+)
 
 
 class PKTokenCommand(Cog):
@@ -54,6 +66,26 @@ class PKTokenCommand(Cog):
         if not use_display_names:
             message = "Your front will now show members names rather than display names."
         return await interaction.response.send_message(content=message, ephemeral=True)
+
+    @config.command(
+        name="set-member-visibility",
+        description="Set if private members should be shown in your front list.",
+    )
+    @choices(privacy_setting=[
+        Choice(name="Hidden from everyone (including you)", value=PRIVATE_TO_EVERYONE_INCL_SYSTEM),
+        Choice(name="Hidden from everyone (except you) [default] ", value=PRIVATE_TO_EVERYONE_NOT_INCL_SYSTEM),
+        Choice(name="Shown to everyone", value=PUBLIC_TO_EVERYONE),
+    ])
+    async def config_set_member_visibility(
+        self,
+        interaction: Interaction[PluralKitDMUtilities],
+        privacy_setting: FrontMemberVisibility,
+    ) -> None:
+        await self.bot.service.set_front_member_visibility(interaction.user.id, privacy_setting)
+        await interaction.response.send_message(
+            content="Your front visibility has been updated!",
+            ephemeral=True,
+        )
 
 async def setup(bot: PluralKitDMUtilities) -> None:
     await bot.add_cog(PKTokenCommand(bot))
