@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import cast
 
 from discord import Interaction, Message, User, app_commands
@@ -114,11 +114,14 @@ class CheckCommand(Cog):
         self,
         interaction: Interaction[PluralKitDMUtilities],
         user_mention: User,
-        message_url: str,
+        message_url: str | None = None,
         ephemeral: bool = True,
     ) -> None:
         await interaction.response.defer(ephemeral=ephemeral)
-        timestamp = snowflake_to_timestamp(int(message_url.split("/")[-1]))
+        if message_url is not None:
+            timestamp = snowflake_to_timestamp(int(message_url.split("/")[-1]))
+        else:
+            timestamp = datetime.now(tz=timezone.utc) - timedelta(seconds=1)  # 1 second offset to adjust for PK api
         await self._handle_check_command(interaction, timestamp, user_mention.id)
 
 
